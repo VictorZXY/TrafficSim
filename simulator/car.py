@@ -1,7 +1,8 @@
 import random
 from typing import List
 
-from road import Road
+from simulator.network import Network
+from simulator.road import Road
 
 
 class Car:
@@ -51,7 +52,7 @@ class Car:
 
     def generate_route(self, network: Network, road_num=10):
         if self.idx == -1:
-            road = random.choice(network.junctions)
+            road = random.choice(network.roads)
             self.idx = 0
             self.dist = road.length
             self.route.append(road)

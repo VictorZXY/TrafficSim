@@ -1,7 +1,7 @@
 import random
-from util import get_bin_idx
 
-from junction import Junction
+from simulator.junction import Junction
+from simulator.util import get_bin_idx
 
 
 class Schedule:

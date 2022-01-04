@@ -1,10 +1,8 @@
-from __future__ import annotations
-
+import random
 from typing import List
 
 from simulator.junction import Junction
 from simulator.road import Road
-import random
 
 
 class Network:
