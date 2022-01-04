@@ -12,7 +12,7 @@ class Car:
     Attributes
     ----------
     name: name of the car
-    road: current road the car is on
+    idx: index of the car's current road on the route
     dist: how far down the road the car still needs to travel
     route: the route taken by the car
     """

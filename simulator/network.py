@@ -40,8 +40,9 @@ class Network:
 
         for i in range(road_num):
             length = random.randint(1, max_road_length)
-            exit_idx = i // 2  # every junction is exit for two roads
+            # every junction is exit for two roads
             # junction number starts from 0
+            exit_idx = i // 2
             if flag[exit_idx] == 0:
                 origin_idx = exit_idx + 1 if exit_idx < junction_num - 1 else 0
             else:
