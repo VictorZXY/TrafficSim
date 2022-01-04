@@ -133,4 +133,4 @@ dmypy.json
 .idea/
 
 # Project-specific (playgrounds, datasets, etc.)
-simulator/playground.py
+playground.py
