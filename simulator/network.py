@@ -56,3 +56,13 @@ class Network:
             self.junctions[origin_idx].out_rds.append(road)
             self.junctions[exit_idx].in_rds.append(road)
             self.roads.append(road)
+
+    # def generate_random_network(self, junction_num, max_road_length=5):
+    #     self.junctions = [Junction(name=i) for i in range(junction_num)]
+    #
+    #     for junction in self.junctions:
+    #         origins = random.choices(self.junctions, k=2)
+    #         for origin in origins:
+    #             in_rd = Road(name=f'road_{origin.name}_{junction.name}', length=length,
+    #                          origin=self.junctions[origin_idx],
+    #                          exit=self.junctions[exit_idx])
