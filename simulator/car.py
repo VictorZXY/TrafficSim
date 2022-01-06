@@ -1,8 +1,11 @@
-import random
-from typing import List
+from __future__ import annotations
 
-from simulator.network import Network
-from simulator.road import Road
+import random
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from network import Network
+    from road import Road
 
 
 class Car:
@@ -19,28 +22,23 @@ class Car:
 
     def __init__(self, name, route: List[Road] = None):
         self.name = name
-        if route is None:
-            self.idx = -1
-            self.dist = -1
-            self.route = []
-        else:
-            self.idx = 0
-            self.dist = route[0].length
-            self.route = route
+        self.idx = 0
+        self.dist = route[0].length if route else -1
+        self.route = route or []
+        self.reward = 0
 
     def get_road(self):
         return self.route[self.idx]
 
-    def advance(self):
+    def tick(self):
         """ Advance on a road """
         if self.dist > 0:
             self.dist -= 1
             if self.dist == 0:
-                self.get_road().exit.enqueue(self)
+                self.get_road().enqueue(self)
+            self.reward += 1
 
-        return self.dist
-
-    def turn(self):
+    def advance(self):
         """ Advance past a junction """
         self.idx += 1
         if self.idx < len(self.route):
@@ -50,10 +48,14 @@ class Car:
         else:
             return None
 
-    def generate_route(self, network: Network, road_num=10):
-        if self.idx == -1:
+    def reset(self):
+        self.idx = 0
+        self.dist = 0
+        self.reward = 0
+
+    def gen_route(self, network: Network, road_num=10):
+        if not self.route:
             road = random.choice(network.roads)
-            self.idx = 0
             self.dist = road.length
             self.route.append(road)
             road_num -= 1
@@ -63,3 +65,5 @@ class Car:
         for i in range(road_num):
             road = random.choice(road.exit.out_rds)
             self.route.append(road)
+
+        return self

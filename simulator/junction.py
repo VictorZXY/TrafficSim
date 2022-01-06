@@ -1,7 +1,7 @@
 from typing import List
 
-from simulator.road import Road
-from simulator.schedule import Schedule, PeriodicSchedule
+from schedule import Schedule, PeriodicSchedule
+from road import Road
 
 
 class Junction:
@@ -20,21 +20,21 @@ class Junction:
                  in_rds: List[Road] = None,
                  out_rds: List[Road] = None,
                  duration: List[int] = None):
-        if duration is None:
-            duration = []
-        if in_rds is None:
-            in_rds = []
-        if out_rds is None:
-            out_rds = []
         self.name = name
-        self.out_rds = []
-        self.in_rds = []
-        assert (len(in_rds) == len(duration))
-        self.schedule: Schedule = PeriodicSchedule(self, duration)
+        self.in_rds = in_rds or []
+        self.out_rds = out_rds or []
+
+        if duration:
+            assert (len(in_rds) == len(duration))
+            self.schedule: Schedule = PeriodicSchedule(self, duration)
+        else:
+            self.schedule = Schedule(self)
 
     def tick(self, t):
         in_rd = self.schedule.get_incoming_at(t)
-        in_rd.deque().turn()
+        car = in_rd.deque()
+        if car:
+            car.advance()
 
     def __str__(self):
         return f'Junction<{self.name}>'

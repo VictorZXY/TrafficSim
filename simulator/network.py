@@ -1,8 +1,8 @@
 import random
 from typing import List
 
-from simulator.junction import Junction
-from simulator.road import Road
+from junction import Junction
+from road import Road
 
 
 class Network:
@@ -28,7 +28,7 @@ class Network:
         else:
             self.roads = roads
 
-    def generate_network(self, junction_num, max_road_length=5):
+    def generate_ring_network(self, junction_num, max_road_length=5):
         self.junctions = []
         for i in range(junction_num):
             self.junctions.append(Junction(name=f'junction_{i}'))
@@ -46,7 +46,7 @@ class Network:
             if flag[exit_idx] == 0:
                 origin_idx = exit_idx + 1 if exit_idx < junction_num - 1 else 0
             else:
-                origin_idx = exit_idx - 1 if exit_idx > 1 else junction_num - 1  # two roads starts from different origins end at exit_idx
+                origin_idx = exit_idx - 1 if exit_idx > 0 else junction_num - 1  # two roads starts from different origins end at exit_idx
 
             flag[exit_idx] += 1
 

@@ -3,7 +3,8 @@ from __future__ import annotations
 import random
 from typing import List
 
-from simulator.util import get_bin_idx
+from network import Network
+from util import get_bin_idx
 
 
 class Car:

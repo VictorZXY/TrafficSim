@@ -1,4 +1,8 @@
-from simulator.car import Car
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from car import Car
 
 
 class Road:
@@ -25,6 +29,9 @@ class Road:
 
     def enqueue(self, car: Car):
         self.queue.append(car)
+
+    def reset(self):
+        self.queue = []
 
     def __str__(self):
         return f'Road<{self.name}>'
