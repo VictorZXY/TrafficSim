@@ -23,7 +23,7 @@ class Car:
     def __init__(self, name, route: List[Road] = None):
         self.name = name
         self.idx = 0
-        self.dist = route[0].length if route else -1
+        self.dist = 0
         self.route = route or []
         self.reward = 0
 
@@ -32,21 +32,18 @@ class Car:
 
     def tick(self):
         """ Advance on a road """
-        if self.dist > 0:
-            self.dist -= 1
-            if self.dist == 0:
-                self.get_road().enqueue(self)
-            self.reward += 1
+        if self.idx < len(self.route):
+            if self.dist < self.get_road().length:
+                self.dist += 1
+                if self.dist == self.get_road().length:
+                    self.get_road().enqueue(self)
+                self.reward += 1
 
     def advance(self):
         """ Advance past a junction """
         self.idx += 1
         if self.idx < len(self.route):
-            road = self.route[self.idx]
-            self.dist = road.length
-            return road
-        else:
-            return None
+            self.dist = 0
 
     def reset(self):
         self.idx = 0

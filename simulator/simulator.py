@@ -44,8 +44,8 @@ class Simulator:
 if __name__ == "__main__":
     network = Network()
     network.generate_ring_network(junction_num=3)
-    cars = [Car(i).gen_route(network) for i in range(100)]
-    simulator = Simulator(network, cars, sim_len=10, cycle_len=10)
+    cars = [Car(i).gen_route(network) for i in range(30)]
+    simulator = Simulator(network, cars, sim_len=1000, cycle_len=10)
 
     x = range(11)
     y = range(11)
@@ -53,19 +53,18 @@ if __name__ == "__main__":
     X, Y, Z = np.meshgrid(x, y, z)
     XYZ = np.array([X.flatten(), Y.flatten(), Z.flatten()]).T
     junctions = simulator.network.junctions
+
     reward = []
     for xyz in XYZ:
+        simulator.reset()
         red_duration_map = {junctions[i]: xyz[i] for i in range(3)}
         simulator.simulate(red_duration_map)
         reward.append(simulator.get_reward())
 
     ax = plt.axes(projection='3d')
     max_reward = max(reward)
-    reward = np.array(reward)/max_reward
+    print(max_reward)
+    # reward = np.array(reward)/max_reward
     print(reward)
     ax.scatter(X, Y, Z, c=reward, cmap='YlOrRd', alpha=1)
     plt.show()
-
-    red_duration_map = {junctions[i]: 10 for i in range(3)}
-    simulator.simulate(red_duration_map)
-    print(simulator.get_reward())
