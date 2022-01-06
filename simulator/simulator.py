@@ -45,7 +45,7 @@ if __name__ == "__main__":
     network = Network()
     network.generate_ring_network(junction_num=3)
     cars = [Car(i).gen_route(network) for i in range(30)]
-    simulator = Simulator(network, cars, sim_len=1000, cycle_len=10)
+    simulator = Simulator(network, cars, sim_len=100, cycle_len=10)
 
     x = range(11)
     y = range(11)
@@ -64,6 +64,7 @@ if __name__ == "__main__":
     ax = plt.axes(projection='3d')
     max_reward = max(reward)
     print(max_reward)
+    print(XYZ[reward.index(max_reward)])
     # reward = np.array(reward)/max_reward
     print(reward)
     ax.scatter(X, Y, Z, c=reward, cmap='YlOrRd', alpha=1)
