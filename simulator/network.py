@@ -1,6 +1,6 @@
 import random
 from typing import List
-
+import numpy as np
 from junction import Junction
 from road import Road
 
@@ -28,12 +28,39 @@ class Network:
         else:
             self.roads = roads
 
-    def generate_ring_network(self, junction_num, max_road_length=5):
+    def generate_ring_network(self, junction_num, max_road_length = 5, circulation = 1):
         self.junctions = []
         for i in range(junction_num):
             self.junctions.append(Junction(name=f'junction_{i}'))
 
         road_num = junction_num * 2
+        jun_without_in = list(np.random.permutation(junction_num))
+
+        for i in range(road_num):
+            length = random.randint(1, max_road_length)
+            exit_idx = i // 2
+            if len(jun_without_in):
+                origin_idx_tmp = jun_without_in.pop()
+                if circulation or origin_idx != exit_idx:                        
+                    origin_idx = origin_idx_tmp
+                else:
+                    origin_idx = jun_without_in.pop()
+                    jun_without_in.append(origin_idx_tmp)
+            else:
+                origin_idx_tmp = random.randint(0,junction_num-1)
+                if circulation or origin_idx != exit_idx:                        
+                    origin_idx = origin_idx_tmp
+                else:
+                    origin_idx = origin_idx_tmp+1 if origin_idx_tmp+1 < junction_num else origin_idx_tmp-1
+
+            road = Road(name=f'road_{origin_idx}_{exit_idx}', length=length,
+                        origin=self.junctions[origin_idx],
+                        exit=self.junctions[exit_idx])
+            self.junctions[origin_idx].out_rds.append(road)
+            self.junctions[exit_idx].in_rds.append(road)
+            self.roads.append(road)
+'''
+        # simple map
         # flag represents number of times a junction becomes an exit of a road,
         # which is equivalent to the length of out_rds of the junction
         flag = [0] * junction_num
@@ -56,13 +83,5 @@ class Network:
             self.junctions[origin_idx].out_rds.append(road)
             self.junctions[exit_idx].in_rds.append(road)
             self.roads.append(road)
+'''
 
-    # def generate_random_network(self, junction_num, max_road_length=5):
-    #     self.junctions = [Junction(name=i) for i in range(junction_num)]
-    #
-    #     for junction in self.junctions:
-    #         origins = random.choices(self.junctions, k=2)
-    #         for origin in origins:
-    #             in_rd = Road(name=f'road_{origin.name}_{junction.name}', length=length,
-    #                          origin=self.junctions[origin_idx],
-    #                          exit=self.junctions[exit_idx])
