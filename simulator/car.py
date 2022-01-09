@@ -16,7 +16,7 @@ class Car:
     ----------
     name: name of the car
     idx: index of the car's current road on the route
-    dist: how far down the road the car still needs to travel
+    dist: how far on the road the car has travelled
     route: the route taken by the car
     """
 

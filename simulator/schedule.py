@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import random
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from simulator.junction import Junction
-
 from simulator.util import get_bin_idx
 
 
