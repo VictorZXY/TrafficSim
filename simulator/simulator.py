@@ -2,18 +2,22 @@ from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 
-from car import Car
-from network import Network
-from schedule import PeriodicSchedule
+from simulator.car import Car
+from simulator.network import Network
+from simulator.schedule import PeriodicSchedule
 
 
 class Simulator:
-    def __init__(self, network: Network, cars: List[Car], sim_len, cycle_len):
+    def __init__(self, network: Network = None, cars: List[Car] = None, sim_len=100):
         self.network = network
         self.cars = cars
         self.sim_len = sim_len
-        self.cycle_len = cycle_len
         self.clock = 0
+
+    def initialize_random_ring(self, junction_num, car_num):
+        self.network = Network()
+        self.network.generate_ring_network(junction_num=junction_num)
+        self.cars = [Car(i).gen_route(self.network) for i in range(car_num)]
 
     def tick(self):
         for junction in self.network.junctions:
@@ -22,13 +26,21 @@ class Simulator:
             car.tick()
         self.clock += 1
 
-    def simulate(self, red_duration_map):
+    def simulate(self, schedule_map):
         for junction in self.network.junctions:
-            red_duration = red_duration_map[junction]
-            green_duration = self.cycle_len - red_duration
-            junction.schedule = PeriodicSchedule(junction, duration=[red_duration, green_duration])
+            # red_duration = red_duration_map[junction]
+            # green_duration = self.cycle_len - red_duration
+            junction.schedule = schedule_map[junction]
         for self.clock in range(self.sim_len):
             self.tick()
+        return self.get_reward()
+
+    def simulate_uniform(self, red_len, green_len):
+        schedule_map = {}
+        for junction in self.network.junctions:
+            schedule_map[junction] = PeriodicSchedule(junction, [red_len, green_len])
+        self.simulate(schedule_map)
+        return self.get_reward()
 
     def get_reward(self):
         return sum([car.reward for car in self.cars])
@@ -42,10 +54,8 @@ class Simulator:
 
 
 if __name__ == "__main__":
-    network = Network()
-    network.generate_ring_network(junction_num=3)
-    cars = [Car(i).gen_route(network) for i in range(30)]
-    simulator = Simulator(network, cars, sim_len=100, cycle_len=10)
+    simulator = Simulator()
+    simulator.initialize_random_ring(junction_num=3, car_num=100)
 
     x = range(11)
     y = range(11)

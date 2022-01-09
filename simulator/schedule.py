@@ -5,9 +5,9 @@ import random
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from junction import Junction
+    from simulator.junction import Junction
 
-from util import get_bin_idx
+from simulator.util import get_bin_idx
 
 
 class Schedule:

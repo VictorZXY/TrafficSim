@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from car import Car
+    from simulator.car import Car
 
 
 class Road:

@@ -1,7 +1,7 @@
 from typing import List
 
-from schedule import Schedule, PeriodicSchedule
-from road import Road
+from simulator.schedule import Schedule, PeriodicSchedule
+from simulator.road import Road
 
 
 class Junction:

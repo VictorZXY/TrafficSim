@@ -1,8 +1,8 @@
 import random
 from typing import List
-import numpy as np
-from junction import Junction
-from road import Road
+
+from simulator.junction import Junction
+from simulator.road import Road
 
 
 class Network:
