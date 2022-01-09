@@ -16,10 +16,11 @@ class Network:
     ----------
     junctions: junctions in the network
     roads: roads in the network
+    cars: cars in the network
     """
 
     def __init__(self, junctions: List[Junction] = None,
-                 roads: List[Road] = None):
+                 roads: List[Road] = None, cars: List[Cars] = None):
         if junctions is None:
             self.junctions = []
         else:
@@ -30,6 +31,11 @@ class Network:
         else:
             self.roads = roads
 
+        if cars is None:
+            self.cars = []
+        else:
+            self.cars = cars
+
     def construct_from_txt_input(self, filepath):
         with open(filepath, 'r') as f:
             # Google Hash Code input file contains bonus points for each car
@@ -37,6 +43,7 @@ class Network:
             # simulator, this bonus is neglected.
             self.junctions = []
             self.roads = []
+            self.cars = []
             road_name_idx_dict = {}
 
             duration, junction_num, road_num, car_num, _ = \
@@ -73,6 +80,7 @@ class Network:
                     route.append(road)
 
                 car = Car(name=f'car_{i}', route=route)
+                self.cars.append(car)
 
                 # Each car starts at the end of the first street (i.e. it waits
                 # for the green light to move to the next street)
@@ -83,6 +91,7 @@ class Network:
                          circulation=1):
         self.junctions = []
         self.roads = []
+        self.cars = []
 
         for i in range(junction_num):
             self.junctions.append(Junction(name=f'junction_{i}'))
