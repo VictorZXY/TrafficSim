@@ -2,9 +2,9 @@ from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 
-from car import Car
-from network import Network
-from schedule import PeriodicSchedule
+from simulator.car import Car
+from simulator.network import Network
+from simulator.schedule import PeriodicSchedule
 
 
 class Simulator:
@@ -43,7 +43,7 @@ class Simulator:
 
 if __name__ == "__main__":
     network = Network()
-    network.generate_ring_network(junction_num=3)
+    network.generate_network(junction_num=3)
     cars = [Car(i).gen_route(network) for i in range(30)]
     simulator = Simulator(network, cars, sim_len=100, cycle_len=10)
 
