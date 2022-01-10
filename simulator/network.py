@@ -79,8 +79,6 @@ class Network:
                 connected_junctions.add(origin)
                 length = random.randint(1, max_road_length)
                 road = Road.connect(origin, junction, length)
-                junction.in_rds.append(road)
-                origin.out_rds.append(road)
                 network.roads.append(road)
 
         return network
