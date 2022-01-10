@@ -64,3 +64,6 @@ class Car:
             self.route.append(road)
 
         return self
+
+    def __str__(self):
+        return f'Car<{self.name}>'
