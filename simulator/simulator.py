@@ -102,6 +102,15 @@ class Simulator:
         self.simulate(schedule_map)
         return self.get_reward()
 
+    def simulate_diff(self, schedule):
+        schedule_map = {}
+        i = 0
+        for junction in self.network.junctions:
+            schedule_map[junction] = PeriodicSchedule(junction, [schedule[i], schedule[i+1]])
+            i += 2
+        self.simulate(schedule_map)
+        return self.get_reward()
+
     def get_reward(self):
         return sum([car.reward for car in self.cars])
 
