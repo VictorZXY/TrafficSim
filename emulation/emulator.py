@@ -75,12 +75,12 @@ opt.plot_convergence()
 print(opt.x_opt)
 print(opt.fx_opt)
 
-# opt_x = None
-# opt_reward = 0
-# for red_len in range(1, 60):
-#     for green_len in range(1, 60):
-#         reward = sim_and_reward(simulation, [red_len, green_len])
-#         if reward < opt_reward:
-#             opt_x = [red_len, green_len]
-#             opt_reward = reward
-# print(opt_x, opt_reward)
+opt_x = None
+opt_reward = 0
+for red_len in range(1, 60):
+    for green_len in range(1, 60):
+        reward = sim_and_reward(simulator, [red_len, green_len])
+        if reward < opt_reward:
+            opt_x = [red_len, green_len]
+            opt_reward = reward
+print(opt_x, opt_reward)

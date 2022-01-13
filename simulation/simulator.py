@@ -30,6 +30,7 @@ class Simulator:
 
             duration, junction_num, road_num, car_num, _ = \
                 tuple(map(int, f.readline().strip().split()))
+            self.sim_len = duration
 
             for i in range(junction_num):
                 network.junctions.append(Junction(name=f'junction_{i}'))
