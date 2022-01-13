@@ -90,30 +90,39 @@ class Simulator:
             car.tick()
         self.clock += 1
 
-    def simulate(self, schedule_map):
-        for junction in self.network.junctions:
-            # red_duration = red_duration_map[junction]
-            # green_duration = self.cycle_len - red_duration
-            junction.schedule = schedule_map[junction]
+    def simulate(self, schedules):
+        for i in range(len(self.network.junctions)):
+            junction = self.network.junctions[i]
+            schedule = schedules[i]
+            junction.schedule = schedule
         for self.clock in range(self.sim_len):
             self.tick()
-        return self.get_reward()
 
     def simulate_uniform(self, red_len, green_len):
-        schedule_map = {}
+        schedules = []
         for junction in self.network.junctions:
-            schedule_map[junction] = PeriodicSchedule(junction, [red_len, green_len])
-        self.simulate(schedule_map)
-        return self.get_reward()
+            schedules.append(PeriodicSchedule([red_len, green_len]))
+        self.simulate(schedules)
 
-    def simulate_diff(self, schedule):
-        schedule_map = {}
-        i = 0
-        for junction in self.network.junctions:
-            schedule_map[junction] = PeriodicSchedule(junction, [schedule[i], schedule[i + 1]])
-            i += 2
-        self.simulate(schedule_map)
-        return self.get_reward()
+    def simulate_distinct(self, red_lens, green_lens):
+        schedules = []
+        for i in range(len(self.network.junctions)):
+            junction = self.network.junctions[i]
+            red_len = red_lens[i]
+            green_len = green_lens[i]
+            schedules.append(PeriodicSchedule([red_len, green_len]))
+        self.simulate(schedules)
+
+    def simulate_preset(self, red_lens, green_lens, modes):
+        preset_schedules = []
+        assert(len(red_lens) == len(green_lens))
+        for i in range(len(red_lens)):
+            preset_schedule = PeriodicSchedule([red_lens[i], green_lens[i]])
+            preset_schedules.append(preset_schedule)
+        schedules = []
+        for mode in modes:
+            schedules.append(preset_schedules[mode])
+        self.simulate(schedules)
 
     def get_reward(self):
         return sum([car.reward for car in self.cars])
@@ -142,8 +151,7 @@ if __name__ == "__main__":
     reward = []
     for xyz in XYZ:
         simulator.reset()
-        red_duration_map = {junctions[i]: PeriodicSchedule(junctions[i],
-                                                           [xyz[i], cycle_len - xyz[i]])
+        red_duration_map = {junctions[i]: PeriodicSchedule([xyz[i], cycle_len - xyz[i]])
                             for i in range(3)}
         simulator.simulate(red_duration_map)
         reward.append(simulator.get_reward())

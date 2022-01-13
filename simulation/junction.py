@@ -26,12 +26,12 @@ class Junction:
 
         if duration:
             assert (len(in_rds) == len(duration))
-            self.schedule: Schedule = PeriodicSchedule(self, duration)
+            self.schedule: Schedule = PeriodicSchedule(duration)
         else:
             self.schedule = Schedule(self)
 
     def tick(self, t):
-        in_rd = self.schedule.get_incoming_at(t)
+        in_rd = self.in_rds[self.schedule.get_incoming_at(t)]
         car = in_rd.deque()
         if car:
             car.advance()
