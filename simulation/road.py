@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from simulator.car import Car
-    from simulator.junction import Junction
+    from simulation.car import Car
+    from simulation.junction import Junction
 
 
 class Road:

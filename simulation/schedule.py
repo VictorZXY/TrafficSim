@@ -4,8 +4,8 @@ import random
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from simulator.junction import Junction
-from simulator.util import get_bin_idx
+    from simulation.junction import Junction
+from simulation.util import get_bin_idx
 
 
 class Schedule:
@@ -21,13 +21,10 @@ class Schedule:
 
     def __init__(self, junction: Junction, schedule=None):
         self.junction = junction
-        self.schedule = schedule
+        self.schedule = schedule or (lambda _: random.choice(self.junction.in_rds))
 
     def get_incoming_at(self, t):
-        if self.schedule:
-            return self.schedule(t)
-        else:
-            return random.choice(self.junction.in_rds)
+        return self.schedule(t)
 
 
 class PeriodicSchedule(Schedule):

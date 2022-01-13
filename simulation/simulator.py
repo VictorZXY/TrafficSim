@@ -2,11 +2,11 @@ from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 
-from simulator.car import Car
-from simulator.junction import Junction
-from simulator.road import Road
-from simulator.network import Network
-from simulator.schedule import PeriodicSchedule
+from simulation.car import Car
+from simulation.junction import Junction
+from simulation.road import Road
+from simulation.network import Network
+from simulation.schedule import PeriodicSchedule
 
 
 class Simulator:
@@ -21,7 +21,7 @@ class Simulator:
         with open(filepath, 'r') as f:
             # Google Hash Code input file contains bonus points for each car
             # that reaches its destination before duration ends. In our
-            # simulator, this bonus is neglected.
+            # simulation, this bonus is neglected.
 
             # Initialize network
             network.junctions = []
@@ -71,9 +71,13 @@ class Simulator:
                 car.dist = route[0].length
                 route[0].enqueue(car)
 
-            # Pass network and cars to simulator instance
+            # Pass network and cars to simulation instance
             self.network = network
             self.cars = cars
+
+    def initialize_random_network(self, junction_num, car_num):
+        self.network = Network.generate_random_network(junction_num=junction_num)
+        self.cars = [Car(i).gen_route(self.network) for i in range(car_num)]
 
     def initialize_random_ring(self, junction_num, car_num):
         self.network = Network.generate_ring_network(junction_num=junction_num)
@@ -106,7 +110,7 @@ class Simulator:
         schedule_map = {}
         i = 0
         for junction in self.network.junctions:
-            schedule_map[junction] = PeriodicSchedule(junction, [schedule[i], schedule[i+1]])
+            schedule_map[junction] = PeriodicSchedule(junction, [schedule[i], schedule[i + 1]])
             i += 2
         self.simulate(schedule_map)
         return self.get_reward()
@@ -124,11 +128,13 @@ class Simulator:
 
 if __name__ == "__main__":
     simulator = Simulator()
+    # simulation.initialize_from_text('../data/a.txt')
     simulator.initialize_random_ring(junction_num=3, car_num=100)
 
-    x = range(11)
-    y = range(11)
-    z = range(11)
+    cycle_len = 11
+    x = range(cycle_len)
+    y = range(cycle_len)
+    z = range(cycle_len)
     X, Y, Z = np.meshgrid(x, y, z)
     XYZ = np.array([X.flatten(), Y.flatten(), Z.flatten()]).T
     junctions = simulator.network.junctions
@@ -136,7 +142,9 @@ if __name__ == "__main__":
     reward = []
     for xyz in XYZ:
         simulator.reset()
-        red_duration_map = {junctions[i]: xyz[i] for i in range(3)}
+        red_duration_map = {junctions[i]: PeriodicSchedule(junctions[i],
+                                                           [xyz[i], cycle_len - xyz[i]])
+                            for i in range(3)}
         simulator.simulate(red_duration_map)
         reward.append(simulator.get_reward())
 

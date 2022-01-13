@@ -2,9 +2,8 @@ import random
 from typing import List
 import numpy as np
 
-from simulator.car import Car
-from simulator.junction import Junction
-from simulator.road import Road
+from simulation.junction import Junction
+from simulation.road import Road
 
 
 class Network:
@@ -16,11 +15,9 @@ class Network:
     ----------
     junctions: junctions in the network
     roads: roads in the network
-    cars: cars in the network
     """
 
-    def __init__(self, junctions: List[Junction] = None,
-                 roads: List[Road] = None, cars: List[Car] = None):
+    def __init__(self, junctions: List[Junction] = None, roads: List[Road] = None):
         self.junctions = junctions or []
         self.roads = roads or []
 
@@ -63,7 +60,7 @@ class Network:
         return network
 
     @staticmethod
-    def generate_random_network(junction_num, max_road_length=5, allow_cyclic=True):
+    def generate_random_network(junction_num, max_road_length=5):
         network = Network()
         network.junctions = []
         network.roads = []

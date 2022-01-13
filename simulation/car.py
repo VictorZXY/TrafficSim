@@ -4,8 +4,8 @@ import random
 from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from simulator.network import Network
-    from simulator.road import Road
+    from simulation.network import Network
+    from simulation.road import Road
 
 
 class Car:
