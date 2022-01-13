@@ -4,5 +4,6 @@ def get_bin_idx(bins, x):
     idx = -1
     while x >= 0:
         x -= bins[idx]
-        idx += 1
+        if x >= 0:
+            idx += 1
     return idx
