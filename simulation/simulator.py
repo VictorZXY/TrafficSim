@@ -138,7 +138,7 @@ class Simulator:
 
 if __name__ == "__main__":
     simulator = Simulator()
-    # simulation.initialize_from_text('../data/a.txt')
+    # simulator.initialize_from_text('../data/a.txt')
     simulator.initialize_random_ring(junction_num=3, car_num=100)
 
     cycle_len = 11
