@@ -1,6 +1,10 @@
 import random
+import re
 from typing import List
+
+import networkx as nx
 import numpy as np
+from matplotlib import pyplot as plt
 
 from simulation.junction import Junction
 from simulation.road import Road
@@ -91,11 +95,51 @@ class Network:
 
         for i in range(junction_num):
             junction = network.junctions[i]
-            prev = network.junctions[(i-1) % junction_num]
-            next = network.junctions[(i+1) % junction_num]
+            prev = network.junctions[(i - 1) % junction_num]
+            next = network.junctions[(i + 1) % junction_num]
             for origin in [prev, next]:
                 length = random.randint(1, max_road_length)
                 road = Road.connect(origin, junction, length)
                 network.roads.append(road)
 
         return network
+
+    def to_networkx_graph(self):
+        G = nx.MultiDiGraph()
+
+        for junction in self.junctions:
+            pattern = re.compile('junction_([0-9])+')
+            if pattern.match(junction.name.lower()):
+                G.add_node(int(junction.name.lower().replace('junction_', '')))
+            else:
+                assert False
+
+        for road in self.roads:
+            origin_junction = road.origin
+            exit_junction = road.exit
+
+            pattern = re.compile('junction_([0-9])+')
+            if pattern.match(origin_junction.name.lower()) \
+                    and pattern.match(exit_junction.name.lower()):
+                G.add_edge(
+                    int(origin_junction.name.lower().replace('junction_', '')),
+                    int(exit_junction.name.lower().replace('junction_', '')),
+                    key=road.name,
+                    weight=road.length
+                )
+            else:
+                assert False
+
+        return G
+
+    def draw(self, node_color='#ffcccc', save_to_filepath=None):
+        G = self.to_networkx_graph()
+        pos = nx.spring_layout(G)
+        edge_labels = dict([((u, v), data['weight'])
+                            for u, v, data in G.edges.data()])
+        nx.draw_networkx(G, pos=pos, node_color=node_color)
+        nx.draw_networkx_edge_labels(G, pos=pos, edge_labels=edge_labels)
+        plt.axis('off')
+        if save_to_filepath:
+            plt.savefig(save_to_filepath, bbox_inches='tight')
+        plt.show()
