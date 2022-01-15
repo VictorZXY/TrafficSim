@@ -126,7 +126,8 @@ class Network:
                     int(origin_junction.name.lower().replace('junction_', '')),
                     int(exit_junction.name.lower().replace('junction_', '')),
                     key=road.name,
-                    weight=road.length
+                    weight=road.length,
+                    weight_inv=1 / road.length,
                 )
             else:
                 assert False
@@ -135,9 +136,8 @@ class Network:
 
     def draw(self, node_color='#ffcccc', save_to_filepath=None):
         G = self.to_networkx_graph()
-        pos = nx.spring_layout(G)
-        edge_labels = dict([((u, v), data['weight'])
-                            for u, v, data in G.edges.data()])
+        pos = nx.spring_layout(G, weight='weight_inv')
+        edge_labels = {(u, v): data['weight'] for u, v, data in G.edges.data()}
         nx.draw_networkx(G, pos=pos, node_color=node_color)
         nx.draw_networkx_edge_labels(G, pos=pos, edge_labels=edge_labels)
         plt.axis('off')
