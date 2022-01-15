@@ -134,5 +134,5 @@ dmypy.json
 
 # Project-specific (playgrounds, datasets, etc.)
 playground.py
-text.*
+test.*
 temp.*

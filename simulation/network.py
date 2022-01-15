@@ -75,8 +75,9 @@ class Network:
         isolated_junctions = set(network.junctions)
         connected_junctions = set()
         for junction in network.junctions:
-            for population in [isolated_junctions, connected_junctions]:
-                origin = population.pop()
+            for population in isolated_junctions, connected_junctions:
+                origin = random.choice(list(population))
+                population.remove(origin)
                 connected_junctions.add(origin)
                 length = random.randint(1, max_road_length)
                 road = Road.connect(origin, junction, length)
