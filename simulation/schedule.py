@@ -14,7 +14,7 @@ class Schedule:
 
     Attributes
     ----------
-    schedule: a function that takes in time and output which road the deque should occur
+    schedule: a function that takes in time and output which road the dequeue should occur
               uses random sampling by default
     """
 
