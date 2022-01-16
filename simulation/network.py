@@ -1,3 +1,4 @@
+import copy
 import random
 import re
 from typing import List
@@ -26,7 +27,7 @@ class Network:
         self.roads = roads or []
 
     @staticmethod
-    def generate_network(junction_num, max_road_length=5, allow_cyclic=1):
+    def generate_network(junction_num, max_road_length=5, allow_cyclic=True):
         network = Network()
         network.junctions = []
         network.roads = []
@@ -64,7 +65,8 @@ class Network:
         return network
 
     @staticmethod
-    def generate_random_network(junction_num, max_road_length=5):
+    def generate_random_network(junction_num, max_road_length=5,
+                                allow_cyclic=True):
         network = Network()
         network.junctions = []
         network.roads = []
@@ -74,14 +76,46 @@ class Network:
 
         isolated_junctions = set(network.junctions)
         connected_junctions = set()
-        for junction in network.junctions:
-            for population in isolated_junctions, connected_junctions:
-                origin = random.choice(list(population))
-                population.remove(origin)
-                connected_junctions.add(origin)
+        for i, exit_junction in enumerate(network.junctions):
+            if allow_cyclic:
+                isolated_choices = set(list(isolated_junctions))
+                connected_choices = set(list(connected_junctions))
+            else:
+                isolated_choices = isolated_junctions - {exit_junction}
+                connected_choices = connected_junctions - {exit_junction}
+
+            if not connected_choices:
+                for _ in range(2):
+                    origin_junction = random.choice(list(isolated_choices))
+                    length = random.randint(1, max_road_length)
+                    road = Road.connect(origin_junction, exit_junction, length)
+                    network.roads.append(road)
+                    isolated_choices.remove(origin_junction)
+
+                    isolated_junctions.remove(origin_junction)
+                    connected_junctions.add(origin_junction)
+            elif not isolated_choices:
+                for _ in range(2):
+                    origin_junction = random.choice(list(connected_choices))
+                    length = random.randint(1, max_road_length)
+                    road = Road.connect(origin_junction, exit_junction, length)
+                    network.roads.append(road)
+                    connected_choices.remove(origin_junction)
+            else:
+                origin_junction_1 = random.choice(list(isolated_choices))
                 length = random.randint(1, max_road_length)
-                road = Road.connect(origin, junction, length)
+                road = Road.connect(origin_junction_1, exit_junction, length)
                 network.roads.append(road)
+                isolated_choices.remove(origin_junction_1)
+
+                origin_junction_2 = random.choice(list(connected_choices))
+                length = random.randint(1, max_road_length)
+                road = Road.connect(origin_junction_2, exit_junction, length)
+                network.roads.append(road)
+                connected_choices.remove(origin_junction_2)
+
+                isolated_junctions.remove(origin_junction_1)
+                connected_junctions.add(origin_junction_1)
 
         return network
 
