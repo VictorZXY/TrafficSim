@@ -1,5 +1,5 @@
 import random
-random.seed(42)
+random.seed(398)
 
 import numpy as np
 import GPy
@@ -115,9 +115,9 @@ def optimize(schedule_type, max_iter=300, mode_num=2):
                                kernel=kernel, acquisition_type='EI')
     opt.run_optimization(max_iter=max_iter, max_time=600)
     if schedule_type in ['preset', 'forced_preset']:
-        opt.plot_convergence(f'../plots/{junction_num}/{schedule_type}_{mode_num}.png')
+        opt.plot_convergence(f'../plots/{junction_num}_2/{schedule_type}_{mode_num}.png')
     else:
-        opt.plot_convergence(f'../plots/{junction_num}/{schedule_type}.png')
+        opt.plot_convergence(f'../plots/{junction_num}_2/{schedule_type}.png')
     print(opt.x_opt)
     print(opt.fx_opt)
 
