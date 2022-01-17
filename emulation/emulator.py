@@ -11,8 +11,8 @@ from simulation.simulator import Simulator
 network_options = ['text', 'random', 'ring']
 schedule_options = ['uniform', 'distinct', 'preset', 'forced_preset']
 network_type = 'random'
-junction_num = 30
-car_num = 300
+junction_num = 40
+car_num = 400
 
 simulator = Simulator()
 if network_type == 'random':
@@ -26,6 +26,8 @@ else:
     raise NameError('Invalid network option')
 simulator.network.draw()
 
+for i in range(1, 300):
+    simulator.cars[i].route = simulator.cars[0].route
 
 def optimize(schedule_type, max_iter=300, mode_num=2):
     def f(x):
@@ -112,7 +114,7 @@ def optimize(schedule_type, max_iter=300, mode_num=2):
                                domain=domain, model_type='GP', initial_design_numdata=80,
                                kernel=kernel, acquisition_type='EI')
     opt.run_optimization(max_iter=max_iter, max_time=300)
-    opt.plot_convergence()
+    opt.plot_convergence(filename=f'../plots/{network_type}_{junction_num}_{car_num}_BO/{schedule_type}_{mode_num}.png')
     print(opt.x_opt)
     print(opt.fx_opt)
 
