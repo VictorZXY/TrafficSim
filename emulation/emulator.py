@@ -114,7 +114,10 @@ def optimize(schedule_type, max_iter=300, mode_num=2):
                                domain=domain, model_type='GP', initial_design_numdata=80,
                                kernel=kernel, acquisition_type='EI')
     opt.run_optimization(max_iter=max_iter, max_time=600)
-    opt.plot_convergence(f'../plots/{junction_num}/{schedule_type}.png')
+    if schedule_type in ['preset', 'forced_preset']:
+        opt.plot_convergence(f'../plots/{junction_num}/{schedule_type}_{mode_num}.png')
+    else:
+        opt.plot_convergence(f'../plots/{junction_num}/{schedule_type}.png')
     print(opt.x_opt)
     print(opt.fx_opt)
 
