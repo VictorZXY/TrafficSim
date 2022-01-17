@@ -11,8 +11,8 @@ from simulation.simulator import Simulator
 network_options = ['text', 'random', 'ring']
 schedule_options = ['uniform', 'distinct', 'preset', 'forced_preset']
 network_type = 'random'
-junction_num = 30
-car_num = 300
+junction_num = 40
+car_num = 400
 
 simulator = Simulator()
 if network_type == 'random':
@@ -26,8 +26,8 @@ else:
     raise NameError('Invalid network option')
 simulator.network.draw()
 
-for i in range(1, 300):
-    simulator.cars[i].route = simulator.cars[0].route
+# for i in range(1, 300):
+#     simulator.cars[i].route = simulator.cars[0].route
 
 def optimize(schedule_type, max_iter=300, mode_num=2):
     def f(x):
@@ -113,8 +113,8 @@ def optimize(schedule_type, max_iter=300, mode_num=2):
     opt = BayesianOptimization(f=lambda X: np.apply_along_axis(f, 1, X),
                                domain=domain, model_type='GP', initial_design_numdata=80,
                                kernel=kernel, acquisition_type='EI')
-    opt.run_optimization(max_iter=max_iter, max_time=300)
-    opt.plot_convergence()
+    opt.run_optimization(max_iter=max_iter, max_time=600)
+    opt.plot_convergence(f'../plots/{junction_num}/{schedule_type}.png')
     print(opt.x_opt)
     print(opt.fx_opt)
 
