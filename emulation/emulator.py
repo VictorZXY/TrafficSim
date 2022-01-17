@@ -9,14 +9,14 @@ from GPyOpt.methods import BayesianOptimization
 from simulation.simulator import Simulator
 
 network_options = ['text', 'random', 'ring']
-schedule_options = ['uniform', 'forced_preset']
+schedule_options = ['uniform', 'distinct', 'preset', 'forced_preset']
 network_type = 'random'
-junction_num = 5
-car_num = 50
+junction_num = 30
+car_num = 300
 
 simulator = Simulator()
 if network_type == 'random':
-    simulator.initialize_random_network(junction_num=junction_num, car_num=car_num, allow_cyclic=False)
+    simulator.initialize_random_network(junction_num=junction_num, car_num=car_num)
 elif network_type == 'random_ring':
     simulator.initialize_random_ring(junction_num=junction_num, car_num=car_num)
 elif network_type == 'text':
@@ -26,6 +26,8 @@ else:
     raise NameError('Invalid network option')
 simulator.network.draw()
 
+for i in range(1, 300):
+    simulator.cars[i].route = simulator.cars[0].route
 
 def optimize(schedule_type, max_iter=300, mode_num=2):
     def f(x):
