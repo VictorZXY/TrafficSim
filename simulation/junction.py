@@ -32,7 +32,7 @@ class Junction:
 
     def tick(self, t):
         in_rd = self.in_rds[self.schedule.get_incoming_at(t)]
-        car = in_rd.deque()
+        car = in_rd.dequeue()
         if car:
             car.advance()
 

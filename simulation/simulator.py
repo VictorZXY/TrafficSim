@@ -76,8 +76,9 @@ class Simulator:
             self.network = network
             self.cars = cars
 
-    def initialize_random_network(self, junction_num, car_num):
-        self.network = Network.generate_random_network(junction_num=junction_num)
+    def initialize_random_network(self, junction_num, car_num, allow_cyclic=True):
+        self.network = Network.generate_random_network(junction_num=junction_num,
+                                                       allow_cyclic=allow_cyclic)
         self.cars = [Car(i).gen_route(self.network) for i in range(car_num)]
 
     def initialize_random_ring(self, junction_num, car_num):
@@ -138,7 +139,7 @@ class Simulator:
 
 if __name__ == "__main__":
     simulator = Simulator()
-    # simulation.initialize_from_text('../data/a.txt')
+    # simulator.initialize_from_text('../data/a.txt')
     simulator.initialize_random_ring(junction_num=3, car_num=100)
 
     cycle_len = 11

@@ -25,7 +25,7 @@ class Road:
         self.origin = origin
         self.exit = exit
 
-    def deque(self) -> Car:
+    def dequeue(self) -> Car:
         return self.queue.pop() if self.queue else None
 
     def enqueue(self, car: Car):
