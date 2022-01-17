@@ -1,3 +1,6 @@
+import random
+random.seed(42)
+
 import numpy as np
 import GPy
 
@@ -8,8 +11,8 @@ from simulation.simulator import Simulator
 network_options = ['text', 'random', 'ring']
 schedule_options = ['uniform', 'distinct', 'preset', 'forced_preset']
 network_type = 'random'
-junction_num = 40
-car_num = 100
+junction_num = 30
+car_num = 300
 
 simulator = Simulator()
 if network_type == 'random':
@@ -17,13 +20,14 @@ if network_type == 'random':
 elif network_type == 'random_ring':
     simulator.initialize_random_ring(junction_num=junction_num, car_num=car_num)
 elif network_type == 'text':
-    simulator.initialize_from_text('../data/a.txt')
+    simulator.initialize_from_text('../data/f.txt')
     junction_num = len(simulator.network.junctions)
 else:
     raise NameError('Invalid network option')
+simulator.network.draw()
 
 
-def optimize(schedule_type, max_iter=100, mode_num=3):
+def optimize(schedule_type, max_iter=300, mode_num=2):
     def f(x):
         simulator.reset()
         x = list(map(int, x))
@@ -87,7 +91,7 @@ def optimize(schedule_type, max_iter=100, mode_num=3):
             domain.append({
                 'name': f'mode_{i}',
                 'type': 'discrete',
-                'domain': range(0, mode_num)
+                'domain': list(range(mode_num))
             })
     elif schedule_type == 'forced_preset':
         input_dim = 1 + junction_num
@@ -100,23 +104,20 @@ def optimize(schedule_type, max_iter=100, mode_num=3):
             domain.append({
                 'name': f'mode_{i}',
                 'type': 'discrete',
-                'domain': range(0, mode_num)
+                'domain': list(range(mode_num))
             })
 
     kernel = GPy.kern.RBF(input_dim=input_dim, variance=1.0, lengthscale=4.0)
-    opt = BayesianOptimization(f=lambda X: np.apply_along_axis(lambda x: f(x), 1, X),
-                               domain=domain, model_type='GP', initial_design_numdata=1,
+    opt = BayesianOptimization(f=lambda X: np.apply_along_axis(f, 1, X),
+                               domain=domain, model_type='GP', initial_design_numdata=80,
                                kernel=kernel, acquisition_type='EI')
-    opt.run_optimization(max_iter=300)
-    # opt.plot_acquisition()
+    opt.run_optimization(max_iter=max_iter, max_time=300)
     opt.plot_convergence()
     print(opt.x_opt)
     print(opt.fx_opt)
 
-for schedule_type in schedule_options:
+
+for schedule_type in ['uniform', 'preset']:
     optimize(schedule_type)
     if schedule_type in ['preset', 'forced_preset']:
-        optimize(schedule_type, mode_num=4)
         optimize(schedule_type, mode_num=5)
-
-

@@ -60,7 +60,7 @@ class Car:
         road = self.get_road()
 
         for i in range(road_num):
-            if not road.ext.out_rds:
+            if not road.exit.out_rds:
                 break
             road = random.choice(road.exit.out_rds)
             self.route.append(road)
