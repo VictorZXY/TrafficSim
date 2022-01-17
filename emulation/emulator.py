@@ -9,14 +9,14 @@ from GPyOpt.methods import BayesianOptimization
 from simulation.simulator import Simulator
 
 network_options = ['text', 'random', 'ring']
-schedule_options = ['uniform', 'distinct', 'preset', 'forced_preset']
+schedule_options = ['uniform', 'forced_preset']
 network_type = 'random'
-junction_num = 30
-car_num = 300
+junction_num = 5
+car_num = 50
 
 simulator = Simulator()
 if network_type == 'random':
-    simulator.initialize_random_network(junction_num=junction_num, car_num=car_num)
+    simulator.initialize_random_network(junction_num=junction_num, car_num=car_num, allow_cyclic=False)
 elif network_type == 'random_ring':
     simulator.initialize_random_ring(junction_num=junction_num, car_num=car_num)
 elif network_type == 'text':
@@ -42,8 +42,8 @@ def optimize(schedule_type, max_iter=300, mode_num=2):
         elif schedule_type == 'preset':
             simulator.simulate_preset(x[:mode_num], x[mode_num:mode_num * 2], x[mode_num * 2:])
         elif schedule_type == 'forced_preset':
-            red_lens = [(int(x[0] * i / (mode_num + 1)) for i in range(1, mode_num + 1))]
-            green_lens = [(int(x[0] * i / (mode_num + 1)) for i in reversed(range(1, mode_num + 1)))]
+            red_lens = [int(x[0] * i / (mode_num + 1)) for i in range(1, mode_num + 1)]
+            green_lens = [int(x[0] * i / (mode_num + 1)) for i in reversed(range(1, mode_num + 1))]
             simulator.simulate_preset(red_lens, green_lens, x[1:])
         return -simulator.get_reward()
 
@@ -98,7 +98,7 @@ def optimize(schedule_type, max_iter=300, mode_num=2):
         domain.append({
             'name': f'cycle_len',
             'type': 'discrete',
-            'domain': range(0, 120)
+            'domain': range(mode_num + 1, (mode_num + 1) * 30, mode_num + 1)
         })
         for i in range(junction_num):
             domain.append({
@@ -117,7 +117,7 @@ def optimize(schedule_type, max_iter=300, mode_num=2):
     print(opt.fx_opt)
 
 
-for schedule_type in ['uniform', 'preset']:
+for schedule_type in schedule_options:
     optimize(schedule_type)
     if schedule_type in ['preset', 'forced_preset']:
         optimize(schedule_type, mode_num=5)
