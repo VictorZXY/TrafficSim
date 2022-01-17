@@ -6,6 +6,7 @@ from typing import List
 import networkx as nx
 import numpy as np
 from matplotlib import pyplot as plt
+from deprecated import deprecated
 
 from simulation.junction import Junction
 from simulation.road import Road
@@ -26,43 +27,34 @@ class Network:
         self.junctions = junctions or []
         self.roads = roads or []
 
-    @staticmethod
-    def generate_network(junction_num, max_road_length=5, allow_cyclic=True):
-        network = Network()
-        network.junctions = []
-        network.roads = []
-        network.cars = []
-
-        for i in range(junction_num):
-            network.junctions.append(Junction(name=f'junction_{i}'))
-
-        road_num = junction_num * 2
-        jun_without_in = list(np.random.permutation(junction_num))
-
-        for i in range(road_num):
-            length = random.randint(1, max_road_length)
-            exit_idx = i // 2
-            if len(jun_without_in):
-                origin_idx_tmp = jun_without_in.pop()
-                if allow_cyclic or origin_idx != exit_idx:
-                    origin_idx = origin_idx_tmp
-                else:
-                    origin_idx = jun_without_in.pop()
-                    jun_without_in.append(origin_idx_tmp)
-            else:
-                origin_idx_tmp = random.randint(0, junction_num - 1)
-                if allow_cyclic or origin_idx != exit_idx:
-                    origin_idx = origin_idx_tmp
-                else:
-                    origin_idx = origin_idx_tmp + 1 if origin_idx_tmp + 1 < junction_num else origin_idx_tmp - 1
-
-            road = Road(name=f'road_{origin_idx}_{exit_idx}', length=length,
-                        origin=network.junctions[origin_idx],
-                        exit=network.junctions[exit_idx])
-            network.junctions[origin_idx].out_rds.append(road)
-            network.junctions[exit_idx].in_rds.append(road)
-            network.roads.append(road)
-        return network
+    def transform(self, k):
+        aux_id = 0
+        for junction in self.junctions:
+            if len(junction.in_rds) == 0:
+                roads = [Road.connect(junction, junction, 0) for _ in range(k)]
+                self.roads.extend(roads)
+            elif len(junction.in_rds) < k:
+                in_nodes = list(map(lambda x: x.origin, junction.in_rds))
+                while len(junction.in_rds) < k:
+                    for node in in_nodes:
+                        if len(junction.in_rds) >= k:
+                            break
+                        else:
+                            self.roads.append(Road.connect(node, junction))
+            elif len(junction.in_rds) > k:
+                in_nodes = list(map(lambda x: x.origin, junction.in_rds))
+                while len(in_nodes) > k:
+                    rewrite_nodes = in_nodes[:k]
+                    aux_node = Junction(f'aux_{aux_id}')
+                    self.roads.append(Road.connect(aux_node, junction, 0))
+                    in_nodes.append(aux_node)
+                    aux_id += 1
+                    for node in rewrite_nodes:
+                        road = junction.get_rd_from(node)
+                        self.roads.remove(road)
+                        junction.in_rds.remove(road)
+                        node.out_rds.remove(road)
+                        self.roads.append(Road.connect(node, aux_node, road.length))
 
     @staticmethod
     def generate_random_network(junction_num, max_road_length=5,
@@ -139,12 +131,39 @@ class Network:
 
         return network
 
+    @staticmethod
+    def generate_from_networkx(G, max_road_length=5):
+        network = Network()
+        network.junctions = []
+        network.roads = []
+
+        node_map = {}
+        for node in G:
+            junction = Junction(node)
+            network.junctions.append(junction)
+            node_map[node] = junction
+
+        for edge in G.edges:
+            origin = node_map[edge[0]]
+            exit = node_map[edge[1]]
+            length = random.randint(1, max_road_length)
+            road = Road.connect(origin, exit, length)
+            network.roads.append(road)
+
+        return network
+
+    @staticmethod
+    def generate_random_k_in(junction_num, k):
+        G = nx.generators.directed.random_uniform_k_out_graph(junction_num, k, self_loops=False)
+        nx.reverse(G, copy=False)
+        return Network.generate_from_networkx(G)
+
     def to_networkx_graph(self):
         G = nx.MultiDiGraph()
 
         for junction in self.junctions:
             pattern = re.compile('junction_([0-9])+')
-            if pattern.match(junction.name.lower()):
+            if pattern.match(str(junction.name).lower()):
                 G.add_node(int(junction.name.lower().replace('junction_', '')))
             else:
                 assert False
@@ -178,3 +197,42 @@ class Network:
         if save_to_filepath:
             plt.savefig(save_to_filepath, bbox_inches='tight')
         plt.show()
+
+    @staticmethod
+    @deprecated
+    def generate_network(junction_num, max_road_length=5, allow_cyclic=True):
+        network = Network()
+        network.junctions = []
+        network.roads = []
+        network.cars = []
+
+        for i in range(junction_num):
+            network.junctions.append(Junction(name=f'junction_{i}'))
+
+        road_num = junction_num * 2
+        jun_without_in = list(np.random.permutation(junction_num))
+
+        for i in range(road_num):
+            length = random.randint(1, max_road_length)
+            exit_idx = i // 2
+            if len(jun_without_in):
+                origin_idx_tmp = jun_without_in.pop()
+                if allow_cyclic or origin_idx != exit_idx:
+                    origin_idx = origin_idx_tmp
+                else:
+                    origin_idx = jun_without_in.pop()
+                    jun_without_in.append(origin_idx_tmp)
+            else:
+                origin_idx_tmp = random.randint(0, junction_num - 1)
+                if allow_cyclic or origin_idx != exit_idx:
+                    origin_idx = origin_idx_tmp
+                else:
+                    origin_idx = origin_idx_tmp + 1 if origin_idx_tmp + 1 < junction_num else origin_idx_tmp - 1
+
+            road = Road(name=f'road_{origin_idx}_{exit_idx}', length=length,
+                        origin=network.junctions[origin_idx],
+                        exit=network.junctions[exit_idx])
+            network.junctions[origin_idx].out_rds.append(road)
+            network.junctions[exit_idx].in_rds.append(road)
+            network.roads.append(road)
+        return network

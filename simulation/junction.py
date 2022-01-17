@@ -36,5 +36,13 @@ class Junction:
         if car:
             car.advance()
 
+    def get_rd_to(self, junction):
+        road = next(filter(lambda x: x.exit == junction, self.out_rds))
+        return road
+
+    def get_rd_from(self, junction):
+        road = next(filter(lambda x: x.origin == junction, self.in_rds))
+        return road
+
     def __str__(self):
         return f'Junction<{self.name}>'
